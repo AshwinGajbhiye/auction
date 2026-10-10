@@ -119,6 +119,10 @@ export const ListingDetailPage: React.FC = () => {
       navigate(`/login?redirect=/listings/${listing.id}`);
       return;
     }
+    if (user?.id === listing.sellerId) {
+      setErrorMessage('You cannot message yourself on your own listing.');
+      return;
+    }
     try {
       const conv = await conversationsApi.getOrCreateConversation(listing.id);
       navigate('/messages', { state: { conversationId: conv.id } });

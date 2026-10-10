@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, X, Tag, Gavel, AlertCircle, Sparkles } from 'lucide-react';
+import { Upload, X, Tag, Gavel, AlertCircle, Sparkles, MapPin } from 'lucide-react';
 import { listingsApi } from '../api/listings';
 import { categoriesApi, Category } from '../api/colleges';
 
@@ -21,6 +21,7 @@ export const CreateListingPage: React.FC = () => {
   const [bidIncrement, setBidIncrement] = useState('50');
   const [durationHours, setDurationHours] = useState('72'); // 3 days default
   const [description, setDescription] = useState('');
+  const [pickupLocation, setPickupLocation] = useState('Main Library / Student Center');
 
   // Image uploads
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -89,6 +90,10 @@ export const CreateListingPage: React.FC = () => {
       formData.append('condition', condition);
       formData.append('listingType', listingType);
       formData.append('description', description.trim());
+      formData.append(
+        'pickupLocation',
+        pickupLocation.trim() || 'On Campus (Library / Student Center)',
+      );
 
       if (listingType === 'FIXED_PRICE') {
         formData.append('fixedPrice', fixedPrice);
@@ -322,6 +327,29 @@ export const CreateListingPage: React.FC = () => {
               placeholder="Include details about item condition, edition, accessories included, and preferred on-campus meetup spots..."
               className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500"
             />
+          </div>
+
+          {/* Campus Pickup / Meetup Location */}
+          <div>
+            <label className="text-xs font-bold text-slate-700 block mb-1">
+              Campus Meetup Location <span className="text-rose-500">*</span>
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-3 text-slate-400">
+                <MapPin className="h-4 w-4 text-brand-600" />
+              </span>
+              <input
+                type="text"
+                required
+                value={pickupLocation}
+                onChange={(e) => setPickupLocation(e.target.value)}
+                placeholder="e.g. Central Library, Student Center 1st Floor, Hostel 4 Cafe"
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500"
+              />
+            </div>
+            <p className="text-[11px] text-slate-400 mt-1">
+              Where can the buyer meet you safely on campus to inspect and pick up the item?
+            </p>
           </div>
 
           {/* Image Upload Area */}

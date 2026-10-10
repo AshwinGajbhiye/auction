@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { requireAuth } from '../../middleware/auth';
+import { BadRequestError } from '../../shared/errors';
 import * as convsService from './conversations.service';
 
 export const conversationsRouter = Router();
@@ -12,8 +13,12 @@ conversationsRouter.get('/', requireAuth, async (req: Request, res: Response) =>
 
 // POST /api/v1/conversations
 conversationsRouter.post('/', requireAuth, async (req: Request, res: Response) => {
+  const listingId = req.body?.listingId;
+  if (!listingId || typeof listingId !== 'string') {
+    throw new BadRequestError('listingId is required.');
+  }
   const conv = await convsService.getOrCreateConversation({
-    listingId: req.body.listingId,
+    listingId,
     buyerId: req.session.userId!,
   });
   res.status(201).json({ success: true, data: conv });

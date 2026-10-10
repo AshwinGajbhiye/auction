@@ -42,15 +42,38 @@ export const MessagesPage: React.FC = () => {
     setLoadingMessages(true);
     conversationsApi
       .getMessages(activeConvId, 1, 100)
-      .then((res) => setMessages(res.items || []))
+      .then((res) => {
+        const unique = (res.items || []).filter(
+          (m, idx, arr) => arr.findIndex((item) => item.id === m.id) === idx,
+        );
+        setMessages(unique);
+      })
       .catch(console.error)
       .finally(() => setLoadingMessages(false));
 
     joinConversation(activeConvId);
 
     const handleNewMessage = (event: any) => {
-      if (event.conversationId === activeConvId) {
-        setMessages((prev) => [...prev, event.message]);
+      if (event.conversationId === activeConvId && event.message) {
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === event.message.id)) {
+            return prev;
+          }
+          return [...prev, event.message];
+        });
+      }
+
+      if (event.message) {
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.id === event.conversationId
+              ? {
+                  ...c,
+                  lastMessage: event.message,
+                }
+              : c,
+          ),
+        );
       }
     };
 
@@ -79,7 +102,23 @@ export const MessagesPage: React.FC = () => {
 
     try {
       const sent = await conversationsApi.sendMessage(activeConvId, content);
-      setMessages((prev) => [...prev, sent]);
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === sent.id)) {
+          return prev;
+        }
+        return [...prev, sent];
+      });
+
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === activeConvId
+            ? {
+                ...c,
+                lastMessage: sent,
+              }
+            : c,
+        ),
+      );
     } catch (err: any) {
       alert(err.message || 'Could not send message.');
     }

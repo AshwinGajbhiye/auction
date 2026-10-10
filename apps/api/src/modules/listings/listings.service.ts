@@ -172,6 +172,12 @@ export async function createListing(
   data: any,
   imageFiles: Express.Multer.File[],
 ) {
+  if (!collegeId) {
+    const user = await prisma.user.findUnique({ where: { id: sellerId }, select: { collegeId: true } });
+    if (!user?.collegeId) throw new BadRequestError('User is not assigned to a campus.');
+    collegeId = user.collegeId;
+  }
+
   if (!data.categoryId) throw new BadRequestError('Category is required.');
   const category = await prisma.category.findUnique({ where: { id: data.categoryId } });
   if (!category?.active) throw new BadRequestError('Invalid category.');
@@ -191,6 +197,11 @@ export async function createListing(
     storedImages.push({ url: stored.url, order: i });
   }
 
+  const pickupLocation =
+    typeof data.pickupLocation === 'string' && data.pickupLocation.trim()
+      ? data.pickupLocation.trim()
+      : 'On Campus (Library / Student Center)';
+
   const listing = await prisma.$transaction(async (tx) => {
     const l = await tx.listing.create({
       data: {
@@ -198,15 +209,15 @@ export async function createListing(
         collegeId,
         categoryId: data.categoryId,
         title: data.title,
-        description: data.description,
-        condition: data.condition,
+        description: data.description ? String(data.description).trim() : '',
+        condition: data.condition || 'GOOD',
         listingType: data.listingType,
         fixedPrice: data.fixedPrice ? parseFloat(data.fixedPrice) : null,
         minimumAcceptablePrice: data.minimumAcceptablePrice
           ? parseFloat(data.minimumAcceptablePrice)
           : null,
         negotiationEnabled: data.negotiationEnabled === 'true' || data.negotiationEnabled === true,
-        pickupLocation: data.pickupLocation,
+        pickupLocation,
         status: 'ACTIVE',
         images: {
           create: storedImages.map((img) => ({ imageUrl: img.url, displayOrder: img.order })),
