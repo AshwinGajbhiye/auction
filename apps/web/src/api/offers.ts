@@ -29,7 +29,7 @@ export const offersApi = {
 
   respondToOffer: (
     offerId: string,
-    action: 'ACCEPT' | 'REJECT' | 'COUNTER',
+    action: 'accept' | 'reject' | 'counter',
     counterAmount?: number,
   ) => api.post(`/offers/${offerId}/respond`, { action, counterAmount }),
 

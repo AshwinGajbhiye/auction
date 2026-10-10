@@ -10,12 +10,11 @@ export interface Purchase {
   status:
     | 'PENDING'
     | 'ACCEPTED'
-    | 'DECLINED'
-    | 'EXCHANGE_ARRANGED'
-    | 'BUYER_CONFIRMED'
-    | 'SELLER_CONFIRMED'
-    | 'COMPLETED'
+    | 'REJECTED'
     | 'CANCELLED'
+    | 'EXPIRED'
+    | 'EXCHANGE_PENDING'
+    | 'COMPLETED'
     | 'DISPUTED';
   buyerConfirmedAt?: string | null;
   sellerConfirmedAt?: string | null;
@@ -48,7 +47,7 @@ export const purchasesApi = {
   createPurchaseRequest: (listingId: string) =>
     api.post<Purchase>(`/listings/${listingId}/purchase-requests`),
 
-  respondToPurchase: (purchaseId: string, action: 'ACCEPT' | 'DECLINE') =>
+  respondToPurchase: (purchaseId: string, action: 'accept' | 'decline' | 'reject') =>
     api.post<Purchase>(`/purchases/${purchaseId}/respond`, { action }),
 
   confirmExchange: (purchaseId: string) =>

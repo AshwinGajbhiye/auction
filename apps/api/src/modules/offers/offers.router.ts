@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { requireAuth, requireVerified } from '../../middleware/auth';
+import { requireAuth } from '../../middleware/auth';
 import * as offersService from './offers.service';
 
 export const offersRouter = Router();
@@ -17,10 +17,12 @@ export const createOfferHandler = async (req: Request, res: Response) => {
 
 // POST /api/v1/offers/:id/respond
 offersRouter.post('/:id/respond', requireAuth, async (req: Request, res: Response) => {
+  // Normalize action to lowercase (frontend may send uppercase: 'ACCEPT', 'REJECT', 'COUNTER')
+  const action = String(req.body.action || '').toLowerCase() as 'accept' | 'reject' | 'counter';
   const result = await offersService.respondToOffer({
     offerId: req.params.id,
     userId: req.session.userId!,
-    action: req.body.action,
+    action,
     counterAmount: req.body.counterAmount ? parseFloat(req.body.counterAmount) : undefined,
   });
   res.json({ success: true, data: result });

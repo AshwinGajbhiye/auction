@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { requireAuth, requireVerified } from '../../middleware/auth';
+import { requireAuth } from '../../middleware/auth';
 import * as purchasesService from './purchases.service';
 
 export const purchasesRouter = Router();
@@ -15,10 +15,13 @@ export const createPurchaseRequestHandler = async (req: Request, res: Response) 
 
 // POST /api/v1/purchases/:id/respond
 purchasesRouter.post('/:id/respond', requireAuth, async (req: Request, res: Response) => {
+  // Normalize action to lowercase and map 'decline' → 'reject' (frontend may send uppercase)
+  const rawAction = String(req.body.action || '').toLowerCase();
+  const action = rawAction === 'decline' ? 'reject' : rawAction as 'accept' | 'reject';
   const data = await purchasesService.respondToPurchase({
     purchaseId: req.params.id,
     userId: req.session.userId!,
-    action: req.body.action,
+    action,
   });
   res.json({ success: true, data });
 });

@@ -63,7 +63,7 @@ export const MyOffersPurchasesPage: React.FC = () => {
   }, []);
 
   // Purchase Actions
-  const handlePurchaseAction = async (purchaseId: string, action: 'ACCEPT' | 'DECLINE') => {
+  const handlePurchaseAction = async (purchaseId: string, action: 'accept' | 'decline') => {
     try {
       await purchasesApi.respondToPurchase(purchaseId, action);
       await loadData();
@@ -84,7 +84,7 @@ export const MyOffersPurchasesPage: React.FC = () => {
   // Offer Actions
   const handleOfferAction = async (
     offerId: string,
-    action: 'ACCEPT' | 'REJECT' | 'COUNTER',
+    action: 'accept' | 'reject' | 'counter',
     counter?: number,
   ) => {
     try {
@@ -223,14 +223,14 @@ export const MyOffersPurchasesPage: React.FC = () => {
                     {!isBuyer && p.status === 'PENDING' && (
                       <>
                         <button
-                          onClick={() => handlePurchaseAction(p.id, 'ACCEPT')}
+                          onClick={() => handlePurchaseAction(p.id, 'accept')}
                           className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs flex items-center gap-1"
                         >
                           <Check className="h-3.5 w-3.5" />
                           Accept Deal
                         </button>
                         <button
-                          onClick={() => handlePurchaseAction(p.id, 'DECLINE')}
+                          onClick={() => handlePurchaseAction(p.id, 'decline')}
                           className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1"
                         >
                           <X className="h-3.5 w-3.5" />
@@ -239,7 +239,7 @@ export const MyOffersPurchasesPage: React.FC = () => {
                       </>
                     )}
 
-                    {(p.status === 'ACCEPTED' || p.status === 'EXCHANGE_ARRANGED') && (
+                    {(p.status === 'ACCEPTED' || p.status === 'EXCHANGE_PENDING') && (
                       <button
                         onClick={() => handleConfirmExchange(p.id)}
                         className="px-4 py-2 rounded-xl gradient-brand text-white text-xs font-bold shadow-xs flex items-center gap-1.5"
@@ -313,7 +313,7 @@ export const MyOffersPurchasesPage: React.FC = () => {
                   {!isBuyer && o.status === 'PENDING' && (
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => handleOfferAction(o.id, 'ACCEPT')}
+                        onClick={() => handleOfferAction(o.id, 'accept')}
                         className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold flex items-center gap-1 shadow-xs"
                       >
                         <Check className="h-3.5 w-3.5" />
@@ -329,7 +329,7 @@ export const MyOffersPurchasesPage: React.FC = () => {
                         Counter
                       </button>
                       <button
-                        onClick={() => handleOfferAction(o.id, 'REJECT')}
+                        onClick={() => handleOfferAction(o.id, 'reject')}
                         className="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold"
                       >
                         <X className="h-3.5 w-3.5" />
@@ -477,7 +477,7 @@ export const MyOffersPurchasesPage: React.FC = () => {
                   onClick={() =>
                     selectedOfferId &&
                     counterAmount &&
-                    handleOfferAction(selectedOfferId, 'COUNTER', parseFloat(counterAmount))
+                    handleOfferAction(selectedOfferId, 'counter', parseFloat(counterAmount))
                   }
                   className="px-5 py-2.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-md"
                 >
