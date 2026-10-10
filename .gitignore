@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+*.log
+uploads/
+coverage/
+.nyc_output/
+prisma/generated/
+*.db
+*.sqlite
+.DS_Store
+.vite/
+.turbo/
